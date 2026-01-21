@@ -1,0 +1,14 @@
+{
+    "Servers": {
+      "1": {
+        "Name": "Logistics Database",
+        "Group": "Production",
+        "Host": "postgres",
+        "Port": 5432,
+        "MaintenanceDB": "logistics_5nf",
+        "Username": "logistics_admin",
+        "SSLMode": "prefer",
+        "PassFile": "/tmp/pgpassfile"
+      }
+    }
+  }

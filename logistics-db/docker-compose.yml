@@ -1,0 +1,88 @@
+version: '3.8'
+
+services:
+  # PostgreSQL сервис
+  postgres:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: logistics_postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: logistics_5nf
+      POSTGRES_USER: logistics_admin
+      POSTGRES_PASSWORD: secure_password_2026
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --lc-collate=ru_RU.UTF-8 --lc-ctype=ru_RU.UTF-8"
+      TZ: Asia/Barnaul
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      # Персистентное хранилище данных
+      - postgres_data:/var/lib/postgresql/data
+      # SQL скрипты для инициализации
+      - ./sql-scripts:/docker-entrypoint-initdb.d
+      # Резервные копии
+      - ./backups:/backups
+      # Логи
+      - ./logs:/var/log/postgresql
+
+    networks:
+      - logistics_network
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U logistics_admin -d logistics_5nf"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+    # Настройки ресурсов
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+        reservations:
+          cpus: '1.0'
+          memory: 2G
+
+  # pgAdmin для управления БД (опционально)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: logistics_pgadmin
+    restart: unless-stopped
+
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com       
+      PGADMIN_DEFAULT_PASSWORD: admin_password_2026
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
+
+    ports:
+      - "5050:80"
+
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./pgadmin-config/servers.json:/pgadmin4/servers.json
+
+    networks:
+      - logistics_network
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+# Volumes для персистентности данных
+volumes:
+  postgres_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+
+# Сеть для изоляции сервисов
+networks:
+  logistics_network:
+    driver: bridge

@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📘 Полная Документация | Система Управления Логистикой (5NF)</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0a0e27 100%);
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+        .header {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
+            backdrop-filter: blur(20px);
+            border-bottom: 2px solid rgba(240, 147, 251, 0.3);
+            padding: 40px 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+        .header h1 {
+            font-size: 2.8em;
+            background: linear-gradient(135deg, #667eea, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.3));
+            padding: 8px 20px;
+            border-radius: 20px;
+            margin: 5px;
+            font-size: 0.9em;
+            border: 1px solid rgba(102, 126, 234, 0.4);
+        }
+        .nav-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px;
+            background: rgba(10, 14, 39, 0.95);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 140px;
+            z-index: 999;
+        }
+        .tab-btn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+            color: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .tab-btn:hover {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.4), rgba(118, 75, 162, 0.4));
+            transform: translateY(-2px);
+        }
+        .tab-btn.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-color: #f093fb;
+            box-shadow: 0 0 20px rgba(240, 147, 251, 0.5);
+        }
+        .content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+        .section.active { display: block; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .card {
+            background: linear-gradient(135deg, rgba(30, 60, 114, 0.5), rgba(42, 82, 152, 0.3));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .card h2 {
+            color: #f093fb;
+            margin-bottom: 20px;
+            font-size: 2em;
+            border-bottom: 2px solid rgba(240, 147, 251, 0.3);
+            padding-bottom: 10px;
+        }
+        .card h3 {
+            color: #4facfe;
+            margin: 25px 0 15px 0;
+            font-size: 1.5em;
+        }
+        .code-block {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            max-height: 600px;
+            overflow-y: auto;
+            position: relative;
+        }
+        .code-block pre {
+            color: #e0e0e0;
+            margin: 0;
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 8px 15px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.85em;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .stat-box {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.3));
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid rgba(102, 126, 234, 0.4);
+        }
+        .stat-box .number {
+            font-size: 3em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .feature-list { list-style: none; padding: 0; }
+        .feature-list li {
+            padding: 12px 0 12px 40px;
+            position: relative;
+            color: rgba(255, 255, 255, 0.85);
+        }
+        .feature-list li::before {
+            content: "✓";
+            position: absolute;
+            left: 10px;
+            color: #4facfe;
+            font-weight: bold;
+            font-size: 1.3em;
+        }
+        .highlight {
+            background: rgba(240, 147, 251, 0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #f093fb;
+            font-weight: 600;
+        }
+        .info-box {
+            background: rgba(33, 150, 243, 0.1);
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .success-box {
+            background: rgba(76, 175, 80, 0.1);
+            border-left: 4px solid #4caf50;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .warning-box {
+            background: rgba(255, 193, 7, 0.1);
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📘 Полная Документация Проекта</h1>
+        <p>Система Управления Логистикой | PostgreSQL | 5-я Нормальная Форма (5NF)</p>
+        <div>
+            <span class="badge">PostgreSQL 16+</span>
+            <span class="badge">17 Таблиц</span>
+            <span class="badge">5NF</span>
+            <span class="badge">58+ Индексов</span>
+        </div>
+    </div>
+
+    <div class="nav-tabs">
+        <button class="tab-btn active" onclick="showTab('overview', this)">📋 Обзор</button>
+        <button class="tab-btn" onclick="showTab('structure', this)">🗂️ Структура БД</button>
+        <button class="tab-btn" onclick="showTab('erd', this)">🗺️ ER-Диаграмма</button>
+        <button class="tab-btn" onclick="showTab('sql', this)">💾 SQL Скрипты</button>
+        <button class="tab-btn" onclick="showTab('indexes', this)">🚀 Индексы</button>
+        <button class="tab-btn" onclick="showTab('procedures', this)">⚙️ Процедуры</button>
+        <button class="tab-btn" onclick="showTab('triggers', this)">🔔 Триггеры</button>
+        <button class="tab-btn" onclick="showTab('security', this)">🔐 Безопасность</button>
+        <button class="tab-btn" onclick="showTab('analytics', this)">📊 Аналитика</button>
+        <button class="tab-btn" onclick="showTab('testing', this)">⚡ Тестирование</button>
+        <button class="tab-btn" onclick="showTab('deployment', this)">🚀 Развертывание</button>
+    </div>
+
+    <div class="content">
+        <!-- ОБЗОР -->
+        <div id="overview" class="section active">
+            <div class="card">
+                <h2>📝 Описание Проекта</h2>
+                <p style="font-size: 1.15em; line-height: 1.8; margin-bottom: 20px;">
+                    Комплексная система управления логистикой для транспортной компании, реализованная 
+                    в <span class="highlight">5-й нормальной форме (5NF)</span> для полного устранения избыточности данных.
+                </p>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="number">17</div>
+                        <div class="label">Таблиц</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="number">23</div>
+                        <div class="label">Связей FK</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="number">3</div>
+                        <div class="label">5NF Таблиц</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="number">58+</div>
+                        <div class="label">Индексов</div>
+                    </div>
+                </div>
+
+                <h3>🎯 Ключевые Возможности</h3>
+                <ul class="feature-list">
+                    <li>Управление грузами, транспортными средствами и маршрутами доставки</li>
+                    <li>Многоуровневые связи M:N через декомпозицию 5NF</li>
+                    <li>Автоматическое обновление статусов грузов через триггеры</li>
+                    <li>Аналитические отчеты по доставкам и платежам</li>
+                    <li>Контроль доступа по ролям (администратор, диспетчер, водитель, бухгалтер)</li>
+                    <li>Row-Level Security для водителей</li>
+                    <li>58+ оптимизированных индексов</li>
+                    <li>Автоматическая генерация номеров грузов и платежей</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- СТРУКТУРА БД -->
+        <div id="structure" class="section">
+            <div class="card">
+                <h2>🗂️ Структура Базы Данных (17 таблиц)</h2>
+
+                <h3>📁 Уровень 1: Справочные Данные (4 таблицы)</h3>
+                <div class="info-box">
+                    <ul class="feature-list">
+                        <li><strong>типы_средств_доставки</strong> - Справочник типов транспорта</li>
+                        <li><strong>города</strong> - Справочник городов присутствия</li>
+                        <li><strong>клиенты</strong> - Клиенты компании</li>
+                        <li><strong>статусы_заказов</strong> - Справочник статусов</li>
+                    </ul>
+                </div>
+
+                <h3>📁 Уровень 2: Директории (2 таблицы)</h3>
+                <div class="info-box">
+                    <ul class="feature-list">
+                        <li><strong>водители</strong> - Персонал компании</li>
+                        <li><strong>склады</strong> - Складские помещения (FK: ид_город)</li>
+                    </ul>
+                </div>
+
+                <h3>📁 Уровень 3: Основные Сущности (5 таблиц)</h3>
+                <div class="info-box">
+                    <ul class="feature-list">
+                        <li><strong>грузы</strong> ⭐ - Центральная таблица грузов</li>
+                        <li><strong>маршруты</strong> - Маршруты доставки</li>
+                        <li><strong>остановки_маршрута</strong> - Промежуточные точки</li>
+                        <li><strong>транспортные_средства</strong> - Автопарк компании</li>
+                        <li><strong>платежи</strong> - Финансовые операции</li>
+                    </ul>
+                </div>
+
+                <h3>⚡ Уровень 4: 5NF Связи (3 таблицы) - ДЕКОМПОЗИЦИЯ M:N:K</h3>
+                <div class="warning-box">
+                    <strong>💡 Важно:</strong> Эти таблицы реализуют тройную связь ГРУЗ ↔ ТРАНСПОРТ ↔ МАРШРУТ через 5NF декомпозицию
+                </div>
+                <div class="success-box">
+                    <ul class="feature-list">
+                        <li><strong>груз_и_средства</strong> 🔥 - ГРУЗ ↔ ТРАНСПОРТ (UNIQUE: ид_груз, ид_средство)</li>
+                        <li><strong>груз_и_маршруты</strong> 🔥 - ГРУЗ ↔ МАРШРУТ (UNIQUE: ид_груз, ид_маршрут)</li>
+                        <li><strong>средство_и_маршруты</strong> 🔥 - ТРАНСПОРТ ↔ МАРШРУТ (UNIQUE: ид_средство, ид_маршрут)</li>
+                    </ul>
+                </div>
+
+                <h3>📁 Уровень 5: Дополнительные Таблицы (3 таблицы)</h3>
+                <div class="info-box">
+                    <ul class="feature-list">
+                        <li><strong>история_статусов</strong> - Аудит изменений статусов</li>
+                        <li><strong>расходы_топлива</strong> - Учет расходов на топливо</li>
+                        <li><strong>техническое_обслуживание</strong> - Учет ТО транспорта</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- ER-ДИАГРАММА -->
+        <div id="erd" class="section">
+            <div class="card">
+                <h2>🗺️ ER-Диаграмма и 5NF Связи</h2>
+
+                <h3>⚡ 5NF Декомпозиция (Тройная Связь)</h3>
+                <div class="code-block">
+                    <pre style="color: #4facfe;">
+    ГРУЗЫ (ид_груз)
+       ↓
+       ├─→ ГРУЗ_И_СРЕДСТВА ←─ ТРАНСПОРТНЫЕ_СРЕДСТВА
+       │      ↓                          ↓
+       │      статус                марка, госномер
+       │      пройдено_км            
+       │
+       ├─→ ГРУЗ_И_МАРШРУТЫ ←─ МАРШРУТЫ
+       │      ↓                     ↓
+       │      остановки          расстояние_км
+       │
+       └─→ (связь замыкается через третью таблицу)
+
+    ТРАНСПОРТНЫЕ_СРЕДСТВА
+       ↓
+       └─→ СРЕДСТВО_И_МАРШРУТЫ ←─ МАРШРУТЫ
+              ↓
+              количество_рейсов
+
+<span style="color: #f093fb;">════════════════════════════════════════</span>
+<span style="color: #4facfe;">ПРЕИМУЩЕСТВА 5NF:</span>
+<span style="color: #f093fb;">════════════════════════════════════════</span>
+
+✓ Устранение избыточности данных
+✓ Отсутствие аномалий обновления
+✓ Независимые связи
+✓ Корректное представление тройной связи M:N:K
+                    </pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- SQL СКРИПТЫ -->
+        <div id="sql" class="section">
+            <div class="card">
+                <h2>💾 SQL Скрипты Создания Таблиц</h2>
+
+                <h3>🗄️ Создание Базы Данных</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">📋 Копировать</button>
+                    <pre>CREATE DATABASE logistics_5nf
+    WITH ENCODING = 'UTF8'
+    LC_COLLATE = 'ru_RU.UTF-8'
+    LC_CTYPE = 'ru_RU.UTF-8'
+    TEMPLATE = template0;
+
+\c logistics_5nf;</pre>
+                </div>
+
+                <h3>⚡ 5NF Таблицы (КЛЮЧЕВЫЕ!)</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">📋 Копировать</button>
+                    <pre>-- ГРУЗ_И_СРЕДСТВА (5NF)
+CREATE TABLE груз_и_средства (
+    ид_груз_средство SERIAL PRIMARY KEY,
+    ид_груз INTEGER NOT NULL,
+    ид_средство INTEGER NOT NULL,
+    статус VARCHAR(20) DEFAULT 'зарезервировано',
+    дата_начала TIMESTAMP,
+    пройдено_км DECIMAL(10,2),
+    CONSTRAINT fk_гс_груз FOREIGN KEY (ид_груз) 
+        REFERENCES грузы(ид_груз) ON DELETE CASCADE,
+    CONSTRAINT fk_гс_средство FOREIGN KEY (ид_средство) 
+        REFERENCES транспортные_средства(ид_средство) ON DELETE RESTRICT,
+    CONSTRAINT uk_груз_средство UNIQUE (ид_груз, ид_средство)
+);
+
+-- ГРУЗ_И_МАРШРУТЫ (5NF)
+CREATE TABLE груз_и_маршруты (
+    ид_груз_маршрут SERIAL PRIMARY KEY,
+    ид_груз INTEGER NOT NULL,
+    ид_маршрут INTEGER NOT NULL,
+    статус VARCHAR(20) DEFAULT 'планируется',
+    CONSTRAINT fk_гм_груз FOREIGN KEY (ид_груз) 
+        REFERENCES грузы(ид_груз) ON DELETE CASCADE,
+    CONSTRAINT fk_гм_маршрут FOREIGN KEY (ид_маршрут) 
+        REFERENCES маршруты(ид_маршрут) ON DELETE RESTRICT,
+    CONSTRAINT uk_груз_маршрут UNIQUE (ид_груз, ид_маршрут)
+);
+
+-- СРЕДСТВО_И_МАРШРУТЫ (5NF)
+CREATE TABLE средство_и_маршруты (
+    ид_средство_маршрут SERIAL PRIMARY KEY,
+    ид_средство INTEGER NOT NULL,
+    ид_маршрут INTEGER NOT NULL,
+    количество_рейсов INTEGER DEFAULT 0,
+    CONSTRAINT fk_см_средство FOREIGN KEY (ид_средство) 
+        REFERENCES транспортные_средства(ид_средство) ON DELETE RESTRICT,
+    CONSTRAINT fk_см_маршрут FOREIGN KEY (ид_маршрут) 
+        REFERENCES маршруты(ид_маршрут) ON DELETE RESTRICT,
+    CONSTRAINT uk_средство_маршрут UNIQUE (ид_средство, ид_маршрут)
+);</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- ИНДЕКСЫ -->
+        <div id="indexes" class="section">
+            <div class="card">
+                <h2>🚀 Индексирование (58+ индексов)</h2>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">📋 Копировать ВСЕ</button>
+                    <pre>-- ГРУЗЫ
+CREATE INDEX idx_грузы_номер ON грузы(номер_груза);
+CREATE INDEX idx_грузы_статус ON грузы(ид_статус);
+CREATE INDEX idx_грузы_клиент ON грузы(ид_клиент);
+CREATE INDEX idx_грузы_дата_создания ON грузы(дата_создания);
+CREATE INDEX idx_грузы_комбо_статус_дата ON грузы(ид_статус, дата_создания);
+
+-- 5NF ТАБЛИЦЫ (КРИТИЧНО!)
+CREATE INDEX idx_гс_груз ON груз_и_средства(ид_груз);
+CREATE INDEX idx_гс_средство ON груз_и_средства(ид_средство);
+CREATE INDEX idx_гс_статус ON груз_и_средства(статус);
+
+CREATE INDEX idx_гм_груз ON груз_и_маршруты(ид_груз);
+CREATE INDEX idx_гм_маршрут ON груз_и_маршруты(ид_маршрут);
+
+CREATE INDEX idx_см_средство ON средство_и_маршруты(ид_средство);
+CREATE INDEX idx_см_маршрут ON средство_и_маршруты(ид_маршрут);
+
+-- ПЛАТЕЖИ
+CREATE INDEX idx_платежи_клиент ON платежи(ид_клиент);
+CREATE INDEX idx_платежи_статус ON платежи(статус_платежа);
+
+-- ... и ещё 40+ индексов</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- ПРОЦЕДУРЫ -->
+        <div id="procedures" class="section">
+            <div class="card">
+                <h2>⚙️ Хранимые Процедуры (6 штук)</h2>
+
+                <h3>1️⃣ Создание груза с автономером</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">📋 Копировать</button>
+                    <pre>CREATE OR REPLACE FUNCTION создать_груз(
+    p_описание TEXT,
+    p_вес_кг DECIMAL,
+    p_ид_клиент INTEGER,
+    p_ид_склад_откуда INTEGER,
+    p_ид_склад_куда INTEGER
+) RETURNS INTEGER AS $$
+DECLARE
+    v_номер_груза VARCHAR(50);
+    v_новый_ид INTEGER;
+BEGIN
+    v_номер_груза := 'GRZ-' || TO_CHAR(CURRENT_DATE, 'YYYY') || '-' || 
+                     LPAD(nextval('seq_номер_груза')::TEXT, 6, '0');
+
+    INSERT INTO грузы (номер_груза, описание, вес_кг, ид_клиент,
+                       ид_склад_откуда, ид_склад_куда, ид_статус)
+    VALUES (v_номер_груза, p_описание, p_вес_кг, p_ид_клиент,
+            p_ид_склад_откуда, p_ид_склад_куда, 1)
+    RETURNING ид_груз INTO v_новый_ид;
+
+    RETURN v_новый_ид;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE SEQUENCE seq_номер_груза START 1;</pre>
+                </div>
+
+                <h3>2️⃣ Расчет стоимости доставки</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">📋 Копировать</button>
+                    <pre>CREATE OR REPLACE FUNCTION рассчитать_стоимость_доставки(
+    p_ид_груз INTEGER,
+    p_ид_маршрут INTEGER
+) RETURNS DECIMAL AS $$
+DECLARE
+    v_вес_кг DECIMAL;
+    v_расстояние_км DECIMAL;
+BEGIN
+    SELECT вес_кг INTO v_вес_кг FROM грузы WHERE ид_груз = p_ид_груз;
+    SELECT общее_расстояние_км INTO v_расстояние_км
+    FROM маршруты WHERE ид_маршрут = p_ид_маршрут;
+
+    RETURN ROUND(v_расстояние_км * 50 * (1 + v_вес_кг / 1000), 2);
+END;
+$$ LANGUAGE plpgsql;</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- ТРИГГЕРЫ -->
+        <div id="triggers" class="section">
+            <div class="card">
+                <h2>🔔 Триггеры (5 штук)</h2>
+
+                <h3>1️⃣ Логирование изменений статусов</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">📋 Копировать</button>
+                    <pre>CREATE OR REPLACE FUNCTION trg_логировать_изменение_статуса()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (TG_OP = 'UPDATE' AND OLD.ид_статус <> NEW.ид_статус) THEN
+        INSERT INTO история_статусов (
+            ид_груз, ид_статус_старый, ид_статус_новый, 
+            дата_изменения, ид_пользователь
+        ) VALUES (
+            NEW.ид_груз, OLD.ид_статус, NEW.ид_статус, 
+            CURRENT_TIMESTAMP, CURRENT_USER
+        );
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_грузы_изменение_статуса
+AFTER UPDATE ON грузы
+FOR EACH ROW
+EXECUTE FUNCTION trg_логировать_изменение_статуса();</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- БЕЗОПАСНОСТЬ -->
+        <div id="security" class="section">
+            <div class="card">
+                <h2>🔐 Контроль Доступа и Безопасность</h2>
+
+                <h3>👥 Роли Пользователей</h3>
+                <div class="info-box">
+                    <ul class="feature-list">
+                        <li>👑 <strong>Администратор</strong> - Полный доступ</li>
+                        <li>📞 <strong>Диспетчер</strong> - Управление грузами</li>
+                        <li>🚗 <strong>Водитель</strong> - Только свои рейсы (RLS)</li>
+                        <li>💰 <strong>Бухгалтер</strong> - Финансы и отчеты</li>
+                    </ul>
+                </div>
+
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">📋 Копировать</button>
+                    <pre>-- РОЛЬ: АДМИНИСТРАТОР
+CREATE ROLE администратор WITH LOGIN PASSWORD 'admin2026';
+GRANT ALL PRIVILEGES ON DATABASE logistics_5nf TO администратор;
+
+-- РОЛЬ: ДИСПЕТЧЕР
+CREATE ROLE диспетчер WITH LOGIN PASSWORD 'dispatcher2026';
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO диспетчер;
+GRANT INSERT, UPDATE ON грузы, груз_и_средства TO диспетчер;
+
+-- ROW-LEVEL SECURITY
+ALTER TABLE грузы ENABLE ROW LEVEL SECURITY;
+CREATE POLICY водитель_только_свои_грузы ON грузы
+FOR SELECT TO водитель
+USING (ид_груз IN (
+    SELECT ид_груз FROM груз_и_средства гс
+    JOIN транспортные_средства тс ON гс.ид_средство = тс.ид_средство
+    WHERE тс.ид_водитель = current_user::INTEGER
+));</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- АНАЛИТИКА -->
+        <div id="analytics" class="section">
+            <div class="card">
+                <h2>📊 Аналитические Запросы</h2>
+
+                <h3>1️⃣ Анализ доставок за период</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">📋 Копировать</button>
+                    <pre>SELECT 
+    со.наименование AS статус,
+    COUNT(г.ид_груз) AS количество,
+    SUM(г.вес_кг) AS общий_вес,
+    SUM(г.стоимость_доставки_руб) AS выручка
+FROM грузы г
+JOIN статусы_заказов со ON г.ид_статус = со.ид_статус
+WHERE г.дата_создания >= '2026-01-01'
+GROUP BY со.наименование
+ORDER BY количество DESC;</pre>
+                </div>
+
+                <h3>2️⃣ Топ водителей</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">📋 Копировать</button>
+                    <pre>SELECT 
+    в.фамилия || ' ' || в.имя AS водитель,
+    COUNT(DISTINCT гс.ид_груз) AS доставок,
+    SUM(гс.пройдено_км) AS пробег
+FROM водители в
+JOIN транспортные_средства тс ON в.ид_водитель = тс.ид_водитель
+JOIN груз_и_средства гс ON тс.ид_средство = гс.ид_средство
+WHERE гс.статус = 'завершено'
+GROUP BY в.ид_водитель, в.фамилия, в.имя
+ORDER BY доставок DESC
+LIMIT 10;</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- ТЕСТИРОВАНИЕ -->
+        <div id="testing" class="section">
+            <div class="card">
+                <h2>⚡ Сценарии Тестирования</h2>
+
+                <h3>1️⃣ Тест производительности индексов</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">📋 Копировать</button>
+                    <pre>\timing on
+
+EXPLAIN ANALYZE
+SELECT * FROM грузы 
+WHERE ид_статус = 4 
+  AND дата_создания >= CURRENT_DATE - INTERVAL '30 days';
+
+-- Ожидается: Index Scan, время < 5ms</pre>
+                </div>
+
+                <h3>2️⃣ Стресс-тест: вставка 10,000 грузов</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">📋 Копировать</button>
+                    <pre>DO $$
+DECLARE i INTEGER;
+BEGIN
+    FOR i IN 1..10000 LOOP
+        PERFORM создать_груз(
+            'Тестовый груз #' || i,
+            RANDOM() * 1000 + 10,
+            (SELECT ид_клиент FROM клиенты ORDER BY RANDOM() LIMIT 1),
+            (SELECT ид_склад FROM склады ORDER BY RANDOM() LIMIT 1),
+            (SELECT ид_склад FROM склады ORDER BY RANDOM() LIMIT 1)
+        );
+    END LOOP;
+END $$;
+
+-- Ожидается: 10,000 записей за 30-60 секунд</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- РАЗВЕРТЫВАНИЕ -->
+        <div id="deployment" class="section">
+            <div class="card">
+                <h2>🚀 Инструкция по Развертыванию</h2>
+
+                <h3>📋 Требования</h3>
+                <div class="info-box">
+                    <ul class="feature-list">
+                        <li>PostgreSQL 16.0+</li>
+                        <li>4GB RAM (рекомендуется 8GB+)</li>
+                        <li>10GB свободного места</li>
+                    </ul>
+                </div>
+
+                <h3>1️⃣ Установка PostgreSQL</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">📋 Копировать</button>
+                    <pre># Ubuntu/Debian
+sudo apt update
+sudo apt install postgresql-16 postgresql-contrib-16
+
+# Запуск
+sudo systemctl start postgresql
+sudo systemctl enable postgresql
+
+# Проверка
+psql --version</pre>
+                </div>
+
+                <h3>2️⃣ Создание БД</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">📋 Копировать</button>
+                    <pre>sudo -u postgres psql
+
+CREATE DATABASE logistics_5nf
+    WITH ENCODING = 'UTF8'
+    LC_COLLATE = 'ru_RU.UTF-8'
+    LC_CTYPE = 'ru_RU.UTF-8';
+
+\c logistics_5nf;</pre>
+                </div>
+
+                <h3>3️⃣ Выполнение скриптов</h3>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyCode(this)">📋 Копировать</button>
+                    <pre>psql -U postgres -d logistics_5nf -f 01_tables.sql
+psql -U postgres -d logistics_5nf -f 02_indexes.sql
+psql -U postgres -d logistics_5nf -f 03_procedures.sql
+psql -U postgres -d logistics_5nf -f 04_triggers.sql</pre>
+                </div>
+
+                <div class="success-box">
+                    <h4 style="color: #4caf50;">✅ База данных готова к работе!</h4>
+                    <p>Рекомендации:</p>
+                    <ul class="feature-list">
+                        <li>Настройте регулярные бэкапы (ежедневно)</li>
+                        <li>Включите мониторинг (pg_stat_statements)</li>
+                        <li>Создайте пользователей с правильными ролями</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabName, buttonElement) {
+            // Скрываем все секции
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Убираем активность со всех кнопок
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Показываем выбранную секцию
+            const targetSection = document.getElementById(tabName);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+
+            // Активируем кнопку
+            if (buttonElement) {
+                buttonElement.classList.add('active');
+            }
+
+            // Прокручиваем наверх
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function copyCode(button) {
+            const codeBlock = button.nextElementSibling;
+            const code = codeBlock.textContent;
+
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = button.textContent;
+                button.textContent = '✅ Скопировано!';
+                button.style.background = 'linear-gradient(135deg, #4caf50, #45a049)';
+
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+                }, 2000);
+            }).catch(err => {
+                alert('Ошибка копирования: ' + err);
+            });
+        }
+    </script>
+</body>
+</html>

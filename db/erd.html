@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERD Ultra - Логистика 5NF</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0a0e27;
+            color: #fff;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* Animated background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            opacity: 0.15;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            flex-shrink: 0;
+            text-align: center;
+            padding: 25px 20px 20px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+        }
+
+        .header-subtitle {
+            font-size: 1em;
+            color: rgba(255,255,255,0.7);
+            font-weight: 500;
+        }
+
+        /* Toolbar */
+        .toolbar {
+            flex-shrink: 0;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            background: rgba(10, 14, 39, 0.5);
+            backdrop-filter: blur(5px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            flex-wrap: wrap;
+        }
+
+        .toolbar-left, .toolbar-right {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 6px;
+            background: rgba(255,255,255,0.05);
+            padding: 4px;
+            border-radius: 25px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .btn {
+            background: transparent;
+            color: rgba(255,255,255,0.7);
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85em;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: 'Inter', sans-serif;
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+        .btn.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .zoom-control {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255,255,255,0.05);
+            padding: 8px 16px;
+            border-radius: 25px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .zoom-btn {
+            background: rgba(102, 126, 234, 0.3);
+            border: 1px solid rgba(102, 126, 234, 0.5);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2em;
+            font-weight: bold;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .zoom-btn:hover {
+            background: rgba(102, 126, 234, 0.6);
+            transform: scale(1.1);
+        }
+
+        .zoom-level {
+            font-size: 0.9em;
+            font-weight: 700;
+            color: #fff;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .stats-mini {
+            display: flex;
+            gap: 15px;
+            font-size: 0.85em;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .stats-mini-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Main Layout */
+        .main-layout {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 260px 1fr 260px;
+            gap: 0;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255,255,255,0.1);
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .sidebar-right {
+            border-right: none;
+            border-left: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-section {
+            margin-bottom: 25px;
+        }
+
+        .sidebar-title {
+            font-size: 1.1em;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #fff;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.2), rgba(118, 75, 162, 0.2));
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            font-size: 0.75em;
+            color: rgba(255,255,255,0.6);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 4px;
+        }
+
+        .info-box {
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 0.8em;
+            line-height: 1.5;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .info-box strong {
+            color: #fff;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .legend-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            font-size: 0.8em;
+        }
+
+        .legend-item:hover {
+            background: rgba(255,255,255,0.05);
+            transform: translateX(4px);
+        }
+
+        .legend-visual {
+            width: 35px;
+            height: 20px;
+            border-radius: 5px;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .legend-line {
+            width: 35px;
+            height: 3px;
+            border-radius: 2px;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .legend-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 5px;
+            flex-shrink: 0;
+        }
+
+        /* Canvas Container */
+        .canvas-container {
+            background: rgba(255,255,255,0.02);
+            position: relative;
+            overflow: hidden;
+            cursor: grab;
+        }
+
+        .canvas-container:active {
+            cursor: grabbing;
+        }
+
+        .canvas-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transform-origin: 0 0;
+            transition: transform 0.2s ease-out;
+        }
+
+        .erd-canvas {
+            position: relative;
+            width: 3200px;
+            height: 2600px;
+            background-image: 
+                radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0);
+            background-size: 40px 40px;
+        }
+
+        /* Mini Map */
+        .minimap {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 200px;
+            height: 160px;
+            background: rgba(10, 14, 39, 0.9);
+            border: 2px solid rgba(102, 126, 234, 0.5);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+            z-index: 1000;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+        }
+
+        .minimap-canvas {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .minimap-viewport {
+            position: absolute;
+            border: 2px solid #f093fb;
+            background: rgba(240, 147, 251, 0.2);
+            pointer-events: none;
+            box-shadow: 0 0 10px rgba(240, 147, 251, 0.5);
+        }
+
+        .minimap-table {
+            position: absolute;
+            background: rgba(102, 126, 234, 0.6);
+            border-radius: 2px;
+        }
+
+        .minimap-table.is-5nf {
+            background: rgba(231, 76, 60, 0.6);
+        }
+
+        /* Table Cards */
+        .table-box {
+            position: absolute;
+            background: linear-gradient(135deg, rgba(30, 60, 114, 0.8), rgba(42, 82, 152, 0.6));
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            border-radius: 14px;
+            width: 310px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        .table-box:hover {
+            transform: scale(1.05);
+            box-shadow: 0 16px 48px rgba(102, 126, 234, 0.4);
+            z-index: 100;
+            border-color: rgba(102, 126, 234, 0.6);
+        }
+
+        .table-box.highlight {
+            border: 3px solid #f093fb;
+            box-shadow: 0 0 40px rgba(240, 147, 251, 0.6);
+            z-index: 101;
+            transform: scale(1.08);
+        }
+
+        .table-box.is-5nf {
+            background: linear-gradient(135deg, rgba(231, 76, 60, 0.3), rgba(240, 147, 251, 0.3));
+            border-color: rgba(231, 76, 60, 0.5);
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.6), rgba(118, 75, 162, 0.6));
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .table-box.is-5nf .table-header {
+            background: linear-gradient(135deg, rgba(231, 76, 60, 0.6), rgba(240, 147, 251, 0.6));
+        }
+
+        .table-name {
+            font-weight: 700;
+            font-size: 0.9em;
+            color: #fff;
+            letter-spacing: -0.01em;
+        }
+
+        .table-badge {
+            background: linear-gradient(135deg, #e74c3c, #f093fb);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.65em;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .table-pk {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 8px 15px;
+            font-size: 0.8em;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .table-body {
+            max-height: 180px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.2);
+        }
+
+        .field-row {
+            padding: 8px 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 8px;
+            font-size: 0.8em;
+        }
+
+        .field-row:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .field-name {
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .field-type {
+            color: rgba(255,255,255,0.5);
+            font-size: 0.85em;
+            font-family: 'Courier New', monospace;
+        }
+
+        .sample-data {
+            background: linear-gradient(135deg, rgba(39, 174, 96, 0.2), rgba(46, 213, 115, 0.2));
+            border-top: 1px solid rgba(39, 174, 96, 0.3);
+            padding: 10px 15px;
+            font-size: 0.75em;
+            line-height: 1.4;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .sample-data strong {
+            color: #2ecc71;
+        }
+
+        /* Connections */
+        .connection-line {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, #4facfe, #00f2fe);
+            transform-origin: left center;
+            pointer-events: none;
+            opacity: 0.6;
+            box-shadow: 0 0 8px rgba(79, 172, 254, 0.3);
+        }
+
+        .connection-line::after {
+            content: '';
+            position: absolute;
+            right: -6px;
+            top: -2.5px;
+            width: 0;
+            height: 0;
+            border-left: 6px solid #00f2fe;
+            border-top: 3px solid transparent;
+            border-bottom: 3px solid transparent;
+        }
+
+        .connection-line.thick {
+            height: 4px;
+            opacity: 1;
+            z-index: 50 !important;
+            box-shadow: 0 0 16px rgba(79, 172, 254, 0.8);
+        }
+
+        .connection-5nf {
+            background: linear-gradient(90deg, #e74c3c, #f093fb) !important;
+            height: 3px;
+            opacity: 0.8;
+            box-shadow: 0 0 12px rgba(231, 76, 60, 0.5);
+        }
+
+        .connection-5nf::after {
+            border-left-color: #f093fb !important;
+        }
+
+        .connection-label {
+            position: absolute;
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-size: 0.65em;
+            font-weight: 700;
+            white-space: nowrap;
+            pointer-events: none;
+            box-shadow: 0 2px 8px rgba(79, 172, 254, 0.4);
+        }
+
+        .connection-label-5nf {
+            background: linear-gradient(135deg, #e74c3c, #f093fb) !important;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.02);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 4px;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .table-box {
+            animation: fadeInUp 0.4s ease backwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation"></div>
+
+    <div class="container">
+        <div class="header">
+            <h1>⚡ ERD Ultra: Логистика 5NF</h1>
+            <p class="header-subtitle">Интерактивная визуализация с зумом и панорамированием</p>
+        </div>
+
+        <div class="toolbar">
+            <div class="toolbar-left">
+                <div class="btn-group">
+                    <button class="btn active" onclick="showAll()">🌐 Все</button>
+                    <button class="btn" onclick="show5NF()">⚡ 5NF</button>
+                    <button class="btn" onclick="showLevel(1)">📋 Справочники</button>
+                    <button class="btn" onclick="showLevel(3)">🚚 Основные</button>
+                </div>
+            </div>
+
+            <div class="toolbar-right">
+                <div class="zoom-control">
+                    <button class="zoom-btn" onclick="zoomOut()">−</button>
+                    <div class="zoom-level" id="zoomLevel">100%</div>
+                    <button class="zoom-btn" onclick="zoomIn()">+</button>
+                    <button class="btn" onclick="resetZoom()">🔄 Сброс</button>
+                </div>
+
+                <div class="stats-mini">
+                    <div class="stats-mini-item">
+                        <span>📦</span>
+                        <span id="visibleTables">17</span>
+                    </div>
+                    <div class="stats-mini-item">
+                        <span>🔗</span>
+                        <span id="visibleConnections">23</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-layout">
+            <!-- Left Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar-section">
+                    <div class="sidebar-title">📊 Статистика</div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">17</div>
+                            <div class="stat-label">Таблиц</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">23</div>
+                            <div class="stat-label">Связей</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">3</div>
+                            <div class="stat-label">5NF</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">58+</div>
+                            <div class="stat-label">Индексов</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="info-box">
+                        <strong>🎮 Управление</strong>
+                        • <strong>Колесо мыши:</strong> зум<br>
+                        • <strong>Drag:</strong> панорама<br>
+                        • <strong>Клик:</strong> подсветка<br>
+                        • <strong>Hover:</strong> увеличение
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="info-box">
+                        <strong>📐 Структура</strong>
+                        Уровень 1: Справочники (4)<br>
+                        Уровень 2: Директории (2)<br>
+                        Уровень 3: Основные (5)<br>
+                        Уровень 4: 5NF (3)<br>
+                        Уровень 5: История (3)
+                    </div>
+                </div>
+            </div>
+
+            <!-- Canvas -->
+            <div class="canvas-container" id="canvasContainer">
+                <div class="canvas-wrapper" id="canvasWrapper">
+                    <div class="erd-canvas" id="erdCanvas"></div>
+                </div>
+
+                <!-- Minimap -->
+                <div class="minimap">
+                    <div class="minimap-canvas" id="minimapCanvas">
+                        <div class="minimap-viewport" id="minimapViewport"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Sidebar -->
+            <div class="sidebar sidebar-right">
+                <div class="sidebar-section">
+                    <div class="sidebar-title">🎨 Легенда</div>
+                    <div class="legend-grid">
+                        <div class="legend-item">
+                            <div class="legend-visual">
+                                <div class="legend-line" style="background: linear-gradient(90deg, #4facfe, #00f2fe);"></div>
+                            </div>
+                            <span>FK связь (1:N)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-visual">
+                                <div class="legend-line" style="background: linear-gradient(90deg, #e74c3c, #f093fb); height: 3px;"></div>
+                            </div>
+                            <span>5NF связь (M:N)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-box" style="background: linear-gradient(135deg, #e74c3c, #c0392b);"></div>
+                            <span>Первичный ключ 🔑</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-box" style="background: linear-gradient(135deg, #4facfe, #00f2fe);"></div>
+                            <span>Внешний ключ 🔗</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-box" style="background: linear-gradient(135deg, #f39c12, #f1c40f);"></div>
+                            <span>UNIQUE ⭐</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-box" style="background: linear-gradient(135deg, rgba(39, 174, 96, 0.3), rgba(46, 213, 115, 0.3)); border: 1px solid #27ae60;"></div>
+                            <span>Примеры 💡</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-section">
+                    <div class="info-box">
+                        <strong>⚡ 5NF Декомпозиция</strong>
+                        Тройная связь без избыточности:<br><br>
+                        ГРУЗ ↔ СРЕДСТВО<br>
+                        ГРУЗ ↔ МАРШРУТ<br>
+                        СРЕДСТВО ↔ МАРШРУТ
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Данные таблиц - улучшенное позиционирование без наложений
+        const tables = [
+            // УРОВЕНЬ 1 - Горизонтальная линия сверху
+            {id: 'tipos', name: 'ТИПЫ_СРЕДСТВ_ДОСТАВКИ', level: 1, x: 100, y: 100, pk: 'ид_тип_средства',
+                fields: [{name: 'наименование', type: 'VARCHAR(100)', unique: true}, {name: 'грузоподъемность_кг', type: 'DECIMAL(10,2)'}, {name: 'объем_куб_м', type: 'DECIMAL(10,2)'}, {name: 'топливо_тип', type: 'VARCHAR(50)'}],
+                sample: 'Газель Next, 1500 кг, 9 м³, бензин'},
+            {id: 'goroda', name: 'ГОРОДА', level: 1, x: 540, y: 100, pk: 'ид_город',
+                fields: [{name: 'название', type: 'VARCHAR(100)', unique: true}, {name: 'регион', type: 'VARCHAR(100)'}, {name: 'население', type: 'INTEGER'}],
+                sample: 'Москва, Московская обл., 13 млн'},
+            {id: 'klienty', name: 'КЛИЕНТЫ', level: 1, x: 980, y: 100, pk: 'ид_клиент',
+                fields: [{name: 'название', type: 'VARCHAR(200)', unique: true}, {name: 'тип_клиента', type: 'VARCHAR(50)'}, {name: 'телефон', type: 'VARCHAR(20)'}],
+                sample: 'ООО "АльфаЛогистик", компания'},
+            {id: 'statusy', name: 'СТАТУСЫ_ЗАКАЗОВ', level: 1, x: 1420, y: 100, pk: 'ид_статус',
+                fields: [{name: 'код_статуса', type: 'VARCHAR(50)', unique: true}, {name: 'наименование', type: 'VARCHAR(100)'}],
+                sample: 'в_пути, В пути'},
+
+            // УРОВЕНЬ 2
+            {id: 'voditeli', name: 'ВОДИТЕЛИ', level: 2, x: 100, y: 500, pk: 'ид_водитель',
+                fields: [{name: 'фамилия', type: 'VARCHAR(50)'}, {name: 'имя', type: 'VARCHAR(50)'}, {name: 'номер_прав', type: 'VARCHAR(20)', unique: true}],
+                sample: 'Иванов И.И., рейтинг 4.85'},
+            {id: 'sklady', name: 'СКЛАДЫ', level: 2, x: 540, y: 500, pk: 'ид_склад',
+                fields: [{name: 'название', type: 'VARCHAR(150)', unique: true}, {name: 'ид_город', type: 'INT', fk: 'goroda'}, {name: 'площадь_кв_м', type: 'DECIMAL(12,2)'}],
+                sample: 'Склад Центральный, 5000 м²'},
+
+            // УРОВЕНЬ 3 - Основные сущности
+            {id: 'transport', name: 'ТРАНСПОРТНЫЕ_СРЕДСТВА', level: 3, x: 100, y: 900, pk: 'ид_средство',
+                fields: [{name: 'госномер', type: 'VARCHAR(20)', unique: true}, {name: 'ид_тип_средства', type: 'INT', fk: 'tipos'}, {name: 'ид_водитель', type: 'INT', fk: 'voditeli'}, {name: 'пробег_км', type: 'INT'}],
+                sample: 'А123ВС77, 45320 км'},
+            {id: 'gruzy', name: 'ГРУЗЫ', level: 3, x: 980, y: 900, pk: 'ид_груз',
+                fields: [{name: 'номер_груза', type: 'VARCHAR(50)', unique: true}, {name: 'вес_кг', type: 'DECIMAL(12,2)'}, {name: 'ид_клиент', type: 'INT', fk: 'klienty'}, {name: 'ид_склад_откуда', type: 'INT', fk: 'sklady'}, {name: 'ид_статус', type: 'INT', fk: 'statusy'}],
+                sample: 'GRZ-2026-0001, 1247.5 кг'},
+            {id: 'marshruty', name: 'МАРШРУТЫ', level: 3, x: 1420, y: 900, pk: 'ид_маршрут',
+                fields: [{name: 'код_маршрута', type: 'VARCHAR(50)', unique: true}, {name: 'наименование', type: 'VARCHAR(100)'}, {name: 'расстояние_км', type: 'DECIMAL(10,2)'}],
+                sample: 'M00001, Москва→Казань, 820 км'},
+            {id: 'ostanovki', name: 'ОСТАНОВКИ_МАРШРУТА', level: 3, x: 1860, y: 900, pk: 'ид_остановка',
+                fields: [{name: 'ид_маршрут', type: 'INT', fk: 'marshruty'}, {name: 'ид_город', type: 'INT', fk: 'goroda'}, {name: 'порядковый_номер', type: 'INT'}],
+                sample: 'Маршрут M00001, остановка 1'},
+            {id: 'platezhi', name: 'ПЛАТЕЖИ', level: 3, x: 540, y: 1300, pk: 'ид_платеж',
+                fields: [{name: 'номер_платежа', type: 'VARCHAR(50)', unique: true}, {name: 'ид_клиент', type: 'INT', fk: 'klienty'}, {name: 'ид_груз', type: 'INT', fk: 'gruzy'}, {name: 'сумма_руб', type: 'DECIMAL(12,2)'}],
+                sample: 'PAY-001, 28700 руб, оплачен'},
+
+            // УРОВЕНЬ 4 - 5NF таблицы
+            {id: 'gruz_sredstva', name: 'ГРУЗ_И_СРЕДСТВА', level: 4, is5nf: true, x: 440, y: 1700, pk: 'ид_груз_средство',
+                fields: [{name: 'ид_груз', type: 'INT', fk: 'gruzy'}, {name: 'ид_средство', type: 'INT', fk: 'transport'}, {name: 'пройдено_км', type: 'DECIMAL(10,2)'}],
+                sample: 'GRZ-001 → А123ВС77, 350 км'},
+            {id: 'gruz_marshruty', name: 'ГРУЗ_И_МАРШРУТЫ', level: 4, is5nf: true, x: 980, y: 1700, pk: 'ид_груз_маршрут',
+                fields: [{name: 'ид_груз', type: 'INT', fk: 'gruzy'}, {name: 'ид_маршрут', type: 'INT', fk: 'marshruty'}, {name: 'статус', type: 'VARCHAR(20)'}],
+                sample: 'GRZ-001 → M00001, активен'},
+            {id: 'sredstvo_marshruty', name: 'СРЕДСТВО_И_МАРШРУТЫ', level: 4, is5nf: true, x: 1520, y: 1700, pk: 'ид_средство_маршрут',
+                fields: [{name: 'ид_средство', type: 'INT', fk: 'transport'}, {name: 'ид_маршрут', type: 'INT', fk: 'marshruty'}, {name: 'количество_рейсов', type: 'INT'}],
+                sample: 'А123ВС77 → M00001, 15 рейсов'},
+
+            // УРОВЕНЬ 5
+            {id: 'istoria', name: 'ИСТОРИЯ_СТАТУСОВ', level: 5, x: 1420, y: 1300, pk: 'ид_история',
+                fields: [{name: 'ид_груз', type: 'INT', fk: 'gruzy'}, {name: 'ид_статус_новый', type: 'INT', fk: 'statusy'}],
+                sample: 'GRZ-001: новый→в_пути'},
+            {id: 'rashody', name: 'РАСХОДЫ_ТОПЛИВА', level: 5, x: 100, y: 1300, pk: 'ид_расход',
+                fields: [{name: 'ид_средство', type: 'INT', fk: 'transport'}, {name: 'объем_л', type: 'DECIMAL(10,2)'}, {name: 'стоимость_руб', type: 'DECIMAL(10,2)'}],
+                sample: '45 л, 2475 руб'},
+            {id: 'tech_obsluzhivanie', name: 'ТЕХ_ОБСЛУЖИВАНИЕ', level: 5, x: 100, y: 1700, pk: 'ид_то',
+                fields: [{name: 'ид_средство', type: 'INT', fk: 'transport'}, {name: 'тип', type: 'VARCHAR(100)'}, {name: 'стоимость_руб', type: 'DECIMAL(12,2)'}],
+                sample: 'Плановое ТО, 8500 руб'}
+        ];
+
+        const connections = [
+            {from: 'tipos', to: 'transport', label: 'FK: тип'},
+            {from: 'goroda', to: 'sklady', label: 'FK: город'},
+            {from: 'goroda', to: 'ostanovki', label: 'FK: город'},
+            {from: 'klienty', to: 'gruzy', label: 'FK: клиент'},
+            {from: 'klienty', to: 'platezhi', label: 'FK: клиент'},
+            {from: 'statusy', to: 'gruzy', label: 'FK: статус'},
+            {from: 'statusy', to: 'istoria', label: 'FK: статус'},
+            {from: 'voditeli', to: 'transport', label: 'FK: водитель'},
+            {from: 'sklady', to: 'gruzy', label: 'FK: склад'},
+            {from: 'marshruty', to: 'ostanovki', label: 'FK: маршрут'},
+            {from: 'gruzy', to: 'platezhi', label: 'FK: груз'},
+            {from: 'gruzy', to: 'istoria', label: 'FK: груз'},
+            {from: 'transport', to: 'rashody', label: 'FK: средство'},
+            {from: 'transport', to: 'tech_obsluzhivanie', label: 'FK: средство'},
+            {from: 'gruzy', to: 'gruz_sredstva', label: '5NF: ГРУЗ', is5nf: true},
+            {from: 'transport', to: 'gruz_sredstva', label: '5NF: СРЕДСТВО', is5nf: true},
+            {from: 'gruzy', to: 'gruz_marshruty', label: '5NF: ГРУЗ', is5nf: true},
+            {from: 'marshruty', to: 'gruz_marshruty', label: '5NF: МАРШРУТ', is5nf: true},
+            {from: 'transport', to: 'sredstvo_marshruty', label: '5NF: СРЕДСТВО', is5nf: true},
+            {from: 'marshruty', to: 'sredstvo_marshruty', label: '5NF: МАРШРУТ', is5nf: true}
+        ];
+
+        // Zoom & Pan
+        let scale = 1;
+        let translateX = 0;
+        let translateY = 0;
+        let isDragging = false;
+        let startX = 0;
+        let startY = 0;
+
+        function createTable(table) {
+            const div = document.createElement('div');
+            div.className = 'table-box' + (table.is5nf ? ' is-5nf' : '');
+            div.id = table.id;
+            div.style.left = table.x + 'px';
+            div.style.top = table.y + 'px';
+
+            let html = `
+                <div class="table-header">
+                    <span class="table-name">${table.name}</span>
+                    ${table.is5nf ? '<span class="table-badge">5NF</span>' : ''}
+                </div>
+                <div class="table-pk">🔑 ${table.pk}</div>
+                <div class="table-body">
+            `;
+
+            table.fields.forEach(field => {
+                const icon = field.fk ? '🔗' : (field.unique ? '⭐' : '');
+                html += `
+                    <div class="field-row">
+                        <div class="field-name">${field.name} ${icon}</div>
+                        <div class="field-type">${field.type}</div>
+                    </div>
+                `;
+            });
+
+            html += `</div><div class="sample-data"><strong>💡</strong> ${table.sample}</div>`;
+            div.innerHTML = html;
+            div.onclick = (e) => { e.stopPropagation(); highlightTable(table.id); };
+            return div;
+        }
+
+        function drawConnection(from, to, label, is5nf = false) {
+            const fromEl = document.getElementById(from);
+            const toEl = document.getElementById(to);
+            if (!fromEl || !toEl) return;
+
+            const fromRect = fromEl.getBoundingClientRect();
+            const toRect = toEl.getBoundingClientRect();
+            const canvas = document.getElementById('erdCanvas');
+
+            const x1 = parseFloat(fromEl.style.left) + 155;
+            const y1 = parseFloat(fromEl.style.top) + fromEl.offsetHeight / 2;
+            const x2 = parseFloat(toEl.style.left) + 155;
+            const y2 = parseFloat(toEl.style.top) + toEl.offsetHeight / 2;
+
+            const length = Math.sqrt(Math.pow(x2-x1, 2) + Math.pow(y2-y1, 2));
+            const angle = Math.atan2(y2-y1, x2-x1) * 180 / Math.PI;
+
+            const line = document.createElement('div');
+            line.className = 'connection-line' + (is5nf ? ' connection-5nf' : '');
+            line.style.left = x1 + 'px';
+            line.style.top = y1 + 'px';
+            line.style.width = length + 'px';
+            line.style.transform = `rotate(${angle}deg)`;
+            line.dataset.from = from;
+            line.dataset.to = to;
+
+            const labelEl = document.createElement('div');
+            labelEl.className = 'connection-label' + (is5nf ? ' connection-label-5nf' : '');
+            labelEl.textContent = label;
+            labelEl.style.left = (x1 + x2)/2 + 'px';
+            labelEl.style.top = (y1 + y2)/2 - 10 + 'px';
+            labelEl.dataset.from = from;
+            labelEl.dataset.to = to;
+
+            canvas.appendChild(line);
+            canvas.appendChild(labelEl);
+        }
+
+        function init() {
+            const canvas = document.getElementById('erdCanvas');
+            tables.forEach(table => canvas.appendChild(createTable(table)));
+            setTimeout(() => {
+                connections.forEach(conn => drawConnection(conn.from, conn.to, conn.label, conn.is5nf));
+                createMinimap();
+            }, 100);
+
+            setupZoomPan();
+        }
+
+        function setupZoomPan() {
+            const container = document.getElementById('canvasContainer');
+            const wrapper = document.getElementById('canvasWrapper');
+
+            // Wheel zoom
+            container.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const delta = e.deltaY > 0 ? -0.1 : 0.1;
+                const newScale = Math.max(0.3, Math.min(2, scale + delta));
+
+                const rect = container.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                const dx = x - translateX;
+                const dy = y - translateY;
+
+                translateX = x - dx * (newScale / scale);
+                translateY = y - dy * (newScale / scale);
+                scale = newScale;
+
+                updateTransform();
+            });
+
+            // Drag pan
+            container.addEventListener('mousedown', (e) => {
+                if (e.target === container || e.target.id === 'canvasWrapper' || e.target.id === 'erdCanvas') {
+                    isDragging = true;
+                    startX = e.clientX - translateX;
+                    startY = e.clientY - translateY;
+                    container.style.cursor = 'grabbing';
+                }
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    translateX = e.clientX - startX;
+                    translateY = e.clientY - startY;
+                    updateTransform();
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+                container.style.cursor = 'grab';
+            });
+        }
+
+        function updateTransform() {
+            const wrapper = document.getElementById('canvasWrapper');
+            wrapper.style.transform = `translate(${translateX}px, ${translateY}px) scale(${scale})`;
+            document.getElementById('zoomLevel').textContent = Math.round(scale * 100) + '%';
+            updateMinimap();
+        }
+
+        function zoomIn() {
+            scale = Math.min(2, scale + 0.2);
+            updateTransform();
+        }
+
+        function zoomOut() {
+            scale = Math.max(0.3, scale - 0.2);
+            updateTransform();
+        }
+
+        function resetZoom() {
+            scale = 1;
+            translateX = 0;
+            translateY = 0;
+            updateTransform();
+        }
+
+        function createMinimap() {
+            const minimapCanvas = document.getElementById('minimapCanvas');
+            const scaleX = 200 / 3200;
+            const scaleY = 160 / 2600;
+
+            tables.forEach(table => {
+                const dot = document.createElement('div');
+                dot.className = 'minimap-table' + (table.is5nf ? ' is-5nf' : '');
+                dot.style.left = (table.x * scaleX) + 'px';
+                dot.style.top = (table.y * scaleY) + 'px';
+                dot.style.width = (310 * scaleX) + 'px';
+                dot.style.height = (15) + 'px';
+                minimapCanvas.appendChild(dot);
+            });
+        }
+
+        function updateMinimap() {
+            const container = document.getElementById('canvasContainer');
+            const viewport = document.getElementById('minimapViewport');
+            const scaleX = 200 / 3200;
+            const scaleY = 160 / 2600;
+
+            const viewWidth = container.clientWidth / scale;
+            const viewHeight = container.clientHeight / scale;
+
+            viewport.style.left = (-translateX / scale * scaleX) + 'px';
+            viewport.style.top = (-translateY / scale * scaleY) + 'px';
+            viewport.style.width = (viewWidth * scaleX) + 'px';
+            viewport.style.height = (viewHeight * scaleY) + 'px';
+        }
+
+        function showAll() {
+            document.querySelectorAll('.table-box').forEach(el => el.style.display = 'block');
+            document.querySelectorAll('.connection-line, .connection-label').forEach(el => el.style.display = 'block');
+            updateStats(17, 23);
+            setActiveBtn(0);
+        }
+
+        function show5NF() {
+            const nfIds = ['gruz_sredstva', 'gruz_marshruty', 'sredstvo_marshruty', 'gruzy', 'transport', 'marshruty'];
+            document.querySelectorAll('.table-box').forEach(el => {
+                el.style.display = nfIds.includes(el.id) ? 'block' : 'none';
+            });
+            document.querySelectorAll('.connection-line, .connection-label').forEach(el => {
+                el.style.display = el.classList.contains('connection-5nf') ? 'block' : 'none';
+            });
+            updateStats(6, 6);
+            setActiveBtn(1);
+        }
+
+        function showLevel(level) {
+            let count = 0;
+            document.querySelectorAll('.table-box').forEach(el => {
+                const table = tables.find(t => t.id === el.id);
+                if (table && table.level === level) {
+                    el.style.display = 'block';
+                    count++;
+                } else {
+                    el.style.display = 'none';
+                }
+            });
+            document.querySelectorAll('.connection-line, .connection-label').forEach(el => el.style.display = 'none');
+            updateStats(count, 0);
+            setActiveBtn(level === 1 ? 2 : 3);
+        }
+
+        function highlightTable(tableId) {
+            document.querySelectorAll('.table-box').forEach(el => el.classList.remove('highlight'));
+            document.getElementById(tableId)?.classList.add('highlight');
+
+            document.querySelectorAll('.connection-line').forEach(line => {
+                if (line.dataset.from === tableId || line.dataset.to === tableId) {
+                    line.classList.add('thick');
+                } else {
+                    line.classList.remove('thick');
+                }
+            });
+        }
+
+        function updateStats(tablesCount, connectionsCount) {
+            document.getElementById('visibleTables').textContent = tablesCount;
+            document.getElementById('visibleConnections').textContent = connectionsCount;
+        }
+
+        function setActiveBtn(index) {
+            document.querySelectorAll('.btn').forEach((btn, i) => {
+                btn.classList.toggle('active', i === index);
+            });
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
