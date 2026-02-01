@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block title %}Панель администратора - Logistics 5NF{% endblock %}
+
+{% block nav_links %}
+<li class="nav-item">
+    <a class="nav-link active" href="{{ url_for('admin.dashboard') }}">
+        <i class="bi bi-speedometer2"></i> Дашборд
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('admin.users') }}">
+        <i class="bi bi-people"></i> Пользователи
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('admin.reports') }}">
+        <i class="bi bi-graph-up"></i> Отчеты
+    </a>
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-md-12">
+        <h2>
+            <i class="bi bi-speedometer2"></i> Панель администратора
+        </h2>
+        <p class="text-muted">Общая статистика системы</p>
+    </div>
+</div>
+
+<!-- Карточки статистики -->
+<div class="row mt-4">
+    <!-- Всего грузов -->
+    <div class="col-md-3 col-sm-6">
+        <div class="card stat-card">
+            <div class="card-body">
+                <h6 class="text-muted">
+                    <i class="bi bi-box-seam"></i> Всего грузов
+                </h6>
+                <h2>{{ total_cargos }}</h2>
+                <small class="text-muted">За всё время</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Сотрудники -->
+    <div class="col-md-3 col-sm-6">
+        <div class="card stat-card success">
+            <div class="card-body">
+                <h6 class="text-muted">
+                    <i class="bi bi-people"></i> Сотрудников
+                </h6>
+                <h2>{{ total_employees }}</h2>
+                <small class="text-muted">Активных пользователей</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Клиенты -->
+    <div class="col-md-3 col-sm-6">
+        <div class="card stat-card warning">
+            <div class="card-body">
+                <h6 class="text-muted">
+                    <i class="bi bi-person-badge"></i> Клиентов
+                </h6>
+                <h2>{{ total_clients }}</h2>
+                <small class="text-muted">Активных клиентов</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Грузов за месяц -->
+    <div class="col-md-3 col-sm-6">
+        <div class="card stat-card info">
+            <div class="card-body">
+                <h6 class="text-muted">
+                    <i class="bi bi-calendar-month"></i> За 30 дней
+                </h6>
+                <h2>{{ monthly_cargos }}</h2>
+                <small class="text-muted">Новых грузов</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Быстрые действия -->
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-lightning"></i> Быстрые действия</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <a href="{{ url_for('admin.users') }}" class="btn btn-outline-primary w-100">
+                            <i class="bi bi-person-plus"></i><br>
+                            Добавить пользователя
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <a href="{{ url_for('admin.reports') }}" class="btn btn-outline-success w-100">
+                            <i class="bi bi-file-earmark-text"></i><br>
+                            Сформировать отчёт
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <a href="#" class="btn btn-outline-info w-100">
+                            <i class="bi bi-database"></i><br>
+                            Резервная копия
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <a href="#" class="btn btn-outline-secondary w-100">
+                            <i class="bi bi-gear"></i><br>
+                            Настройки системы
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Системная информация -->
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-info-circle"></i> Информация о системе</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm mb-0">
+                    <tbody>
+                        <tr>
+                            <td><strong>Версия системы:</strong></td>
+                            <td>1.0.0</td>
+                        </tr>
+                        <tr>
+                            <td><strong>База данных:</strong></td>
+                            <td>PostgreSQL 16</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Сервер:</strong></td>
+                            <td>Flask 3.0.0</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Нормальная форма:</strong></td>
+                            <td>5NF (Fifth Normal Form)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-clock-history"></i> Последняя активность</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item">
+                        <small class="text-muted">Сегодня в 14:30</small><br>
+                        Создан новый груз #12345
+                    </div>
+                    <div class="list-group-item">
+                        <small class="text-muted">Сегодня в 12:15</small><br>
+                        Добавлен новый пользователь
+                    </div>
+                    <div class="list-group-item">
+                        <small class="text-muted">Вчера в 18:45</small><br>
+                        Создана резервная копия БД
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

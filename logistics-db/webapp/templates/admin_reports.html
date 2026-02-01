@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block title %}Отчёты - Logistics 5NF{% endblock %}
+
+{% block nav_links %}
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('admin.dashboard') }}">
+        <i class="bi bi-speedometer2"></i> Дашборд
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('admin.users') }}">
+        <i class="bi bi-people"></i> Пользователи
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link active" href="{{ url_for('admin.reports') }}">
+        <i class="bi bi-graph-up"></i> Отчеты
+    </a>
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-md-12">
+        <h2><i class="bi bi-graph-up"></i> Отчёты и аналитика</h2>
+        <p class="text-muted">Статистика работы системы</p>
+    </div>
+</div>
+
+<!-- KPI по месяцам -->
+<div class="row mt-4">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-graph-up-arrow"></i> KPI доставок по месяцам</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Месяц</th>
+                                <th>Всего заказов</th>
+                                <th>Доставлено</th>
+                                <th>Процент выполнения</th>
+                                <th>Прогресс</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in kpi_data %}
+                            <tr>
+                                <td><strong>{{ row['месяц'] }}</strong></td>
+                                <td>{{ row['всего_заказов'] }}</td>
+                                <td>
+                                    <span class="badge bg-success">
+                                        {{ row['доставлено'] }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% set percent = (row['доставлено'] / row['всего_заказов'] * 100) | round(1) if row['всего_заказов'] > 0 else 0 %}
+                                    {{ percent }}%
+                                </td>
+                                <td>
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar 
+                                                    {% if percent >= 80 %}bg-success
+                                                    {% elif percent >= 50 %}bg-warning
+                                                    {% else %}bg-danger{% endif %}" 
+                                             role="progressbar" 
+                                             style="width: {{ percent }}%">
+                                            {{ percent }}%
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">
+                                    Нет данных за последние месяцы
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Топ клиентов -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-trophy"></i> Топ-10 клиентов</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Клиент</th>
+                                <th>Заказов</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for client in top_clients %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ client['название'] }}</td>
+                                <td>
+                                    <span class="badge bg-info">
+                                        {{ client['количество_заказов'] }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted">
+                                    Нет данных
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Экспорт отчётов -->
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-download"></i> Экспорт отчётов</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <button class="btn btn-outline-success w-100">
+                            <i class="bi bi-file-earmark-excel"></i> Excel
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-outline-danger w-100">
+                            <i class="bi bi-file-earmark-pdf"></i> PDF
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-outline-primary w-100">
+                            <i class="bi bi-file-earmark-text"></i> CSV
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-outline-info w-100">
+                            <i class="bi bi-printer"></i> Печать
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

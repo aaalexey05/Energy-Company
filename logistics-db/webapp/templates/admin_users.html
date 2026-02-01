@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+
+{% block title %}Пользователи - Logistics 5NF{% endblock %}
+
+{% block nav_links %}
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('admin.dashboard') }}">
+        <i class="bi bi-speedometer2"></i> Дашборд
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link active" href="{{ url_for('admin.users') }}">
+        <i class="bi bi-people"></i> Пользователи
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('admin.reports') }}">
+        <i class="bi bi-graph-up"></i> Отчеты
+    </a>
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-md-12 d-flex justify-content-between align-items-center">
+        <div>
+            <h2><i class="bi bi-people"></i> Управление пользователями</h2>
+            <p class="text-muted">Список всех сотрудников системы</p>
+        </div>
+        <div>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
+                <i class="bi bi-person-plus"></i> Добавить пользователя
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Поиск и фильтры -->
+<div class="row mt-3">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <input type="text" class="form-control" id="searchInput" 
+                               placeholder="Поиск по имени, email...">
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" id="roleFilter">
+                            <option value="">Все роли</option>
+                            <option value="Администратор">Администратор</option>
+                            <option value="Менеджер по заказам">Менеджер</option>
+                            <option value="Кладовщик">Кладовщик</option>
+                            <option value="Курьер">Курьер</option>
+                            <option value="Клиент">Клиент</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" id="statusFilter">
+                            <option value="">Все статусы</option>
+                            <option value="active">Активные</option>
+                            <option value="inactive">Неактивные</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Таблица пользователей -->
+<div class="row mt-3">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="usersTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>ФИО</th>
+                                <th>Email</th>
+                                <th>Роль</th>
+                                <th>Статус</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for emp in employees %}
+                            <tr>
+                                <td>{{ emp['ид_сотрудник'] }}</td>
+                                <td>
+                                    <strong>{{ emp['фамилия'] }} {{ emp['имя'] }}</strong>
+                                </td>
+                                <td>
+                                    <i class="bi bi-envelope"></i> {{ emp['email'] }}
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary">
+                                        {{ emp['роль'] }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if emp['активен'] %}
+                                        <span class="badge bg-success">
+                                            <i class="bi bi-check-circle"></i> Активен
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-danger">
+                                            <i class="bi bi-x-circle"></i> Неактивен
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <button class="btn btn-outline-primary" title="Редактировать">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button class="btn btn-outline-danger" 
+                                                onclick="return confirmDelete('Удалить пользователя {{ emp['фамилия'] }} {{ emp['имя'] }}?')" 
+                                                title="Удалить">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center">
+                                    <div class="empty-state">
+                                        <i class="bi bi-people"></i>
+                                        <h4>Нет пользователей</h4>
+                                        <p>Добавьте первого пользователя</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно добавления пользователя -->
+<div class="modal fade" id="addUserModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-person-plus"></i> Добавить пользователя
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addUserForm">
+                    <div class="mb-3">
+                        <label for="firstName" class="form-label">Имя</label>
+                        <input type="text" class="form-control" id="firstName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="lastName" class="form-label">Фамилия</label>
+                        <input type="text" class="form-control" id="lastName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="role" class="form-label">Роль</label>
+                        <select class="form-select" id="role" required>
+                            <option value="">Выберите роль...</option>
+                            <option value="1">Администратор</option>
+                            <option value="2">Менеджер по заказам</option>
+                            <option value="3">Кладовщик</option>
+                            <option value="4">Курьер</option>
+                            <option value="5">Клиент</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Пароль</label>
+                        <input type="password" class="form-control" id="password" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-primary">Создать</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Поиск по таблице
+document.getElementById('searchInput').addEventListener('keyup', function() {
+    const filter = this.value.toLowerCase();
+    const rows = document.querySelectorAll('#usersTable tbody tr');
+
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(filter) ? '' : 'none';
+    });
+});
+</script>
+{% endblock %}

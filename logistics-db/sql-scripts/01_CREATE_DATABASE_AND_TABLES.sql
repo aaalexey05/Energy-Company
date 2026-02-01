@@ -8,12 +8,12 @@
 -- ШАГ 1: СОЗДАНИЕ БАЗЫ ДАННЫХ
 -- ═══════════════════════════════════════════════════════════════════════════════
 
-CREATE DATABASE logistics_5nf
-    WITH 
-    ENCODING = 'UTF8'
-    LC_COLLATE = 'ru_RU.UTF-8'
-    LC_CTYPE = 'ru_RU.UTF-8'
-    TEMPLATE = template0;
+-- CREATE DATABASE logistics_5nf
+--     WITH 
+--     ENCODING = 'UTF8'
+--     LC_COLLATE = 'ru_RU.UTF-8'
+--     LC_CTYPE = 'ru_RU.UTF-8'
+--     TEMPLATE = template0;
 
 -- Подключаемся к созданной БД
 \c logistics_5nf;

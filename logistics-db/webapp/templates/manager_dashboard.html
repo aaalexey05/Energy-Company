@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}Менеджер - Панель{% endblock %}
+
+{% block nav_links %}
+<li class="nav-item">
+    <a class="nav-link active" href="{{ url_for('manager.dashboard') }}">
+        <i class="bi bi-clipboard-data"></i> Дашборд
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('manager.orders') }}">
+        <i class="bi bi-box-seam"></i> Заказы
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('manager.analytics') }}">
+        <i class="bi bi-bar-chart"></i> Аналитика
+    </a>
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-md-12">
+        <h2><i class="bi bi-clipboard-data"></i> Панель менеджера</h2>
+        <p class="text-muted">Управление заказами и доставками</p>
+    </div>
+</div>
+
+<!-- Статистика -->
+<div class="row mt-4">
+    <div class="col-md-4 col-sm-6">
+        <div class="card stat-card warning">
+            <div class="card-body">
+                <h6 class="text-muted">
+                    <i class="bi bi-hourglass-split"></i> Активных заказов
+                </h6>
+                <h2>{{ active_orders }}</h2>
+                <small class="text-muted">В обработке</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 col-sm-6">
+        <div class="card stat-card success">
+            <div class="card-body">
+                <h6 class="text-muted">
+                    <i class="bi bi-calendar-check"></i> Заказов за сегодня
+                </h6>
+                <h2>{{ today_orders }}</h2>
+                <small class="text-muted">Новых поступлений</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 col-sm-6">
+        <div class="card stat-card info">
+            <div class="card-body">
+                <h6 class="text-muted">
+                    <i class="bi bi-clock-history"></i> Требуют внимания
+                </h6>
+                <h2>0</h2>
+                <small class="text-muted">Срочных заказов</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Быстрые действия -->
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-lightning-charge"></i> Быстрые действия</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <button class="btn btn-primary w-100 h-100" data-bs-toggle="modal" data-bs-target="#newOrderModal">
+                            <i class="bi bi-plus-circle" style="font-size: 2rem;"></i><br>
+                            Создать заказ
+                        </button>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <a href="{{ url_for('manager.orders') }}" class="btn btn-outline-primary w-100 h-100">
+                            <i class="bi bi-list-ul" style="font-size: 2rem;"></i><br>
+                            Все заказы
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <a href="{{ url_for('manager.analytics') }}" class="btn btn-outline-success w-100 h-100">
+                            <i class="bi bi-graph-up" style="font-size: 2rem;"></i><br>
+                            Аналитика
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <button class="btn btn-outline-info w-100 h-100">
+                            <i class="bi bi-file-earmark-text" style="font-size: 2rem;"></i><br>
+                            Отчёты
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Последние заказы -->
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-clock-history"></i> Последние заказы</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">
+                    Перейдите в раздел 
+                    <a href="{{ url_for('manager.orders') }}">Заказы</a> 
+                    для просмотра полного списка
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно нового заказа -->
+<div class="modal fade" id="newOrderModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-plus-circle"></i> Создать новый заказ
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="newOrderForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="client" class="form-label">Клиент</label>
+                            <select class="form-select" id="client" required>
+                                <option value="">Выберите клиента...</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="cargoType" class="form-label">Тип груза</label>
+                            <select class="form-select" id="cargoType" required>
+                                <option value="">Выберите тип...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="fromWarehouse" class="form-label">Склад отправления</label>
+                            <select class="form-select" id="fromWarehouse" required>
+                                <option value="">Выберите склад...</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="toWarehouse" class="form-label">Склад назначения</label>
+                            <select class="form-select" id="toWarehouse" required>
+                                <option value="">Выберите склад...</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Описание</label>
+                        <textarea class="form-control" id="description" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <button type="button" class="btn btn-primary">Создать</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

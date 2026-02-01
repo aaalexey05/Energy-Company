@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}Вход в систему - Logistics 5NF{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="row justify-content-center w-100">
+        <div class="col-md-5 col-lg-4">
+            <div class="card login-card shadow-lg">
+                <!-- Заголовок -->
+                <div class="login-header">
+                    <i class="bi bi-truck"></i>
+                    <h3 class="mb-0">Logistics 5NF</h3>
+                    <p class="mb-0">Система управления логистикой</p>
+                </div>
+
+                <!-- Форма входа -->
+                <div class="login-body">
+                    <h5 class="text-center mb-4">Вход в систему</h5>
+
+                    <form method="POST" action="{{ url_for('login') }}" id="loginForm">
+                        <!-- Email -->
+                        <div class="mb-3">
+                            <label for="email" class="form-label">
+                                <i class="bi bi-envelope"></i> Email
+                            </label>
+                            <input type="email" 
+                                   class="form-control" 
+                                   id="email" 
+                                   name="email" 
+                                   placeholder="your@email.com"
+                                   required 
+                                   autofocus>
+                        </div>
+
+                        <!-- Пароль -->
+                        <div class="mb-3">
+                            <label for="password" class="form-label">
+                                <i class="bi bi-lock"></i> Пароль
+                            </label>
+                            <input type="password" 
+                                   class="form-control" 
+                                   id="password" 
+                                   name="password" 
+                                   placeholder="••••••••"
+                                   required>
+                        </div>
+
+                        <!-- Запомнить меня -->
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" 
+                                   class="form-check-input" 
+                                   id="remember" 
+                                   name="remember">
+                            <label class="form-check-label" for="remember">
+                                Запомнить меня
+                            </label>
+                        </div>
+
+                        <!-- Кнопка входа -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-box-arrow-in-right"></i> Войти
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Забыли пароль -->
+                    <div class="text-center mt-3">
+                        <a href="#" class="text-muted text-decoration-none">
+                            <small>Забыли пароль?</small>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Тестовые учётные записи -->
+            <div class="card mt-3 shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <i class="bi bi-info-circle"></i> Тестовые учётные записи
+                    </h6>
+                    <small class="text-muted">
+                        <table class="table table-sm mb-0">
+                            <tbody>
+                                <tr>
+                                    <td><strong>Администратор:</strong></td>
+                                    <td>admin@logistics.ru</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Менеджер:</strong></td>
+                                    <td>manager@logistics.ru</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Кладовщик:</strong></td>
+                                    <td>warehouse@logistics.ru</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Курьер:</strong></td>
+                                    <td>courier@logistics.ru</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Клиент:</strong></td>
+                                    <td>client@logistics.ru</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" class="text-center pt-2">
+                                        <em>Пароль для всех: <code>password123</code></em>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Валидация формы входа
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    if (!email || !password) {
+        e.preventDefault();
+        alert('Пожалуйста, заполните все поля');
+    }
+});
+</script>
+{% endblock %}

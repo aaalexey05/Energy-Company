@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Доставки - Logistics 5NF{% endblock %}
+
+{% block nav_links %}
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('courier.dashboard') }}">
+        <i class="bi bi-truck"></i> Дашборд
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link active" href="{{ url_for('courier.deliveries') }}">
+        <i class="bi bi-box-seam"></i> Доставки
+    </a>
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="row mt-4">
+    <div class="col-md-12">
+        <h2><i class="bi bi-box-seam"></i> Мои доставки</h2>
+        <p class="text-muted">Активные и завершённые доставки</p>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>№ Груза</th>
+                                <th>Клиент</th>
+                                <th>Маршрут</th>
+                                <th>Статус</th>
+                                <th>Дата</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for del in deliveries %}
+                            <tr>
+                                <td><strong>{{ del['номер_груза'] }}</strong></td>
+                                <td>{{ del['клиент'] }}</td>
+                                <td>
+                                    {{ del['от'] }} → {{ del['до'] }}
+                                </td>
+                                <td>
+                                    <span class="badge 
+                                        {% if del['статус'] == 'В пути' %}bg-primary
+                                        {% else %}bg-success{% endif %}">
+                                        {{ del['статус'] }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <small>{{ del['дата_создания'].strftime('%d.%m.%Y') }}</small>
+                                </td>
+                                <td>
+                                    {% if del['статус'] == 'В пути' %}
+                                    <button class="btn btn-sm btn-success">
+                                        <i class="bi bi-check-circle"></i> Доставлено
+                                    </button>
+                                    {% else %}
+                                    <span class="text-muted">—</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">
+                                    Нет активных доставок
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

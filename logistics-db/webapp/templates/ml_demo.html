@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ML Предсказания</title>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: Arial; max-width: 800px; margin: 50px auto; padding: 20px; }
+        .section { background: #f5f5f5; padding: 20px; margin: 20px 0; border-radius: 8px; }
+        input, select { padding: 8px; margin: 5px; width: 200px; }
+        button { background: #3498db; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #2980b9; }
+        .result { background: #e8f5e9; padding: 15px; margin: 10px 0; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🤖 ML Предсказания</h1>
+    
+    <div class="section">
+        <h2>1️⃣ Прогноз времени доставки</h2>
+        <input type="number" id="distance1" placeholder="Расстояние (км)" value="1000">
+        <input type="number" id="weight1" placeholder="Вес (кг)" value="5000">
+        <input type="number" id="volume1" placeholder="Объем (м³)" value="25">
+        <select id="vehicle1">
+            <option>Газель</option>
+            <option selected>Грузовик</option>
+            <option>Фура</option>
+        </select>
+        <br><br>
+        <button onclick="predictTime()">🔮 Предсказать</button>
+        <div id="result1"></div>
+    </div>
+    
+    <div class="section">
+        <h2>2️⃣ Рекомендация транспорта</h2>
+        <input type="number" id="distance2" placeholder="Расстояние (км)" value="800">
+        <input type="number" id="weight2" placeholder="Вес (кг)" value="3000">
+        <input type="number" id="volume2" placeholder="Объем (м³)" value="15">
+        <br><br>
+        <button onclick="recommendVehicle()">🚚 Подобрать</button>
+        <div id="result2"></div>
+    </div>
+    
+    <script>
+    async function predictTime() {
+        const data = {
+            distance_km: document.getElementById('distance1').value,
+            weight_kg: document.getElementById('weight1').value,
+            volume_m3: document.getElementById('volume1').value,
+            vehicle_type: document.getElementById('vehicle1').value
+        };
+        
+        const response = await fetch('/api/ml/predict_delivery_time', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            document.getElementById('result1').innerHTML = 
+                '<div class="result"><strong>⏱️ Прогноз:</strong> ' +
+                result.prediction.days + ' дней (' + result.prediction.hours + ' часов)</div>';
+        }
+    }
+    
+    async function recommendVehicle() {
+        const data = {
+            distance_km: document.getElementById('distance2').value,
+            weight_kg: document.getElementById('weight2').value,
+            volume_m3: document.getElementById('volume2').value
+        };
+        
+        const response = await fetch('/api/ml/recommend_vehicle', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            let html = '<div class="result"><strong>✅ Рекомендация:</strong> ' + result.recommended_vehicle + '<br><br>';
+            html += '<strong>Альтернативы:</strong><ul>';
+            result.alternatives.forEach(alt => {
+                html += '<li>' + alt.vehicle + ': ' + (alt.probability * 100).toFixed(1) + '%</li>';
+            });
+            html += '</ul></div>';
+            document.getElementById('result2').innerHTML = html;
+        }
+    }
+    </script>
+</body>
+</html>

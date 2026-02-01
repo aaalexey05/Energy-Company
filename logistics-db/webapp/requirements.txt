@@ -1,0 +1,18 @@
+# Flask и расширения
+Flask==3.0.0
+Flask-Login==0.6.3
+Werkzeug==3.0.1
+
+# База данных PostgreSQL
+psycopg2-binary==2.9.9
+
+# Утилиты
+python-dotenv==1.0.0
+
+bcrypt==4.1.2
+
+# ML Libraries
+scikit-learn==1.3.2
+pandas==2.1.4
+numpy==1.26.2
+joblib==1.3.2
