@@ -1,3 +1,4 @@
+```
 logistics-db/
 │
 ├── backups/                  # Автоматические и ручные резервные копии БД
@@ -51,3 +52,5 @@ logistics-db/
 ├── Dockerfile                # Корневой Dockerfile (опционально)
 ├── Makefile                  # Команды автоматизации (make build, make up)
 └── README.md                 # Документация проекта
+
+```
