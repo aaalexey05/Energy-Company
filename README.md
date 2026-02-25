@@ -1,3 +1,9 @@
+## Energy Company 
+
+### Структура проекта
+
+Исключено: .venv, .env
+
 ```
 logistics-db/
 │
